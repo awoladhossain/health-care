@@ -1,0 +1,53 @@
+✅ What is a Transaction?
+
+A transaction means:
+Do multiple database operations as one single unit.
+If all succeed → save to database
+If any one fails → undo everything (rollback)
+
+Think of it like:
+"Either all work completes together, or nothing happens."
+
+🧠 Why Do We Need Transactions?
+
+Suppose you want to create a user and also create an admin profile for that user.
+
+If the user is created successfully, but the admin profile fails, your database will become inconsistent (user exists but no admin record).
+
+So, we use a transaction to ensure consistency.
+
+
+🔥 Your Code Example (Explained)
+const [createdUser, createdAdmin] = await prisma.$transaction([
+  prisma.user.create({ data: userData }),
+  prisma.admin.create({ data: adminData }),
+]);
+
+
+Meaning:
+
+Create user
+
+Create admin
+
+If step 2 fails → step 1 is automatically undone.
+So your database stays clean and correct.
+
+
+
+🧾 When Should You Use Transactions?
+
+| Situation                                    | Why?                                      |
+| -------------------------------------------- | ----------------------------------------- |
+| Creating data in **multiple tables**         | To avoid partial data saving              |
+| Updating **related records**                 | So all updates stay consistent            |
+| Transferring money, inventory, booking seats | Critical operations must not fail halfway |
+| Deleting records from **multiple tables**    | To avoid leftover (orphan) data           |
+
+
+📝 Your Simplified Note (Copy & Save)
+Transaction → Group of DB operations.
+If one fails → rollback all.
+Use transaction when operations are dependent on each other.
+Ensures data consistency.
+

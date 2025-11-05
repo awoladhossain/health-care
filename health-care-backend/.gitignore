@@ -1,0 +1,56 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/src/generated/prisma
+# Ignore prisma files
+prisma/
+# Ignore TS build files
+dist
+
+# Ignore node_modules
+node_modules
+
+# Ignore environment variables
+.env
+
+# Ignore local storage files
+storage
+
+# Ignore logs
+logs
+
+# Ignore OS files
+.DS_Store
+._*
+.Thumbs.db
+desktop.ini
+
+# Ignore VSCode files
+.vscode
+
+# Ignore npm/yarn files
+yarn.lock
+package-lock.json
+
+# Ignore IDE files
+.idea
+*.iml
+out
+.local
+.settings.xml
+ws_imports
+
+# Ignore test files
+coverage
+jest.config.js
+*.test.ts
+*.test.js.map
+
+# Ignore build files
+build
+build.xml
+
+# Ignore dependencies
+dependencies
+devDependencies
