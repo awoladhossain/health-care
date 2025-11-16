@@ -1,22 +1,20 @@
 import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import pick from "../../../shared/pick";
+import { adminFilterAbleFileds } from "./admin.constant";
 import { AdminService } from "./admin.service";
 
 const getAllFromDB = async (req: Request, res: Response) => {
   try {
-    const safeQuery = pick(req.query, [
-      "name",
-      "email",
-      "searchTerm",
-      "contactNumber",
-    ]);
+    const safeQuery = pick(req.query, adminFilterAbleFileds);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
 
-    const result = await AdminService.getAllFromDB(safeQuery);
+    const result = await AdminService.getAllFromDB(safeQuery, options);
     res.status(200).json({
       status: 200,
       message: "Admins Fetched Successfully!",
-      data: result,
+      meta: result.meta,
+      data: result.data,
     });
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -34,7 +32,34 @@ const getAllFromDB = async (req: Request, res: Response) => {
     });
   }
 };
+const getByIdFromDB = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    console.log(id)
+    const result = await AdminService.getByIdFromDB(id as string);
+    res.status(200).json({
+      status: 200,
+      message: "Admins Fetched Successfully By ID!",
+      data: result,
+    });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: err.name || "Failed to fetch Admins By ID",
+        error: err.message,
+      });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Failed to fetch Admins By ID",
+      error: err,
+    });
+  }
+};
 
 export const AdminController = {
   getAllFromDB,
+  getByIdFromDB,
 };
