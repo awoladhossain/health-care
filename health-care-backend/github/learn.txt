@@ -1,0 +1,2 @@
+git checkout -b 'your branch name' ==> git checkout -b devbarch
+git branch
