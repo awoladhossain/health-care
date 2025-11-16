@@ -1,2 +1,13 @@
 git checkout -b 'your branch name' ==> git checkout -b devbarch
 git branch
+
+# create a new branch
+git branch testbranch
+#switch to an existing branch
+git checkout testbranch
+#create a new branch and switch to it
+git checkout -b testbranch
+#delete a branch
+git branch -d testbranch
+#list all branches
+git branch
