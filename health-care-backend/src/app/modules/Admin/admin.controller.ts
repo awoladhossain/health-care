@@ -35,7 +35,7 @@ const getAllFromDB = async (req: Request, res: Response) => {
 const getByIdFromDB = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
-    console.log(id)
+    console.log(id);
     const result = await AdminService.getByIdFromDB(id as string);
     res.status(200).json({
       status: 200,
@@ -59,7 +59,106 @@ const getByIdFromDB = async (req: Request, res: Response) => {
   }
 };
 
+const updateIntoDB = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: "ID parameter is required",
+    });
+  }
+  try {
+    const result = await AdminService.updateIntoDB(id, req.body);
+    res.status(200).json({
+      status: 200,
+      message: "Admin updated Successfully By ID!",
+      data: result,
+    });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: err.name || "Failed to fetch Admins By ID",
+        error: err.message,
+      });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Failed to fetch Admins By ID",
+      error: err,
+    });
+  }
+};
+
+const deleteFromDB = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: "ID parameter is required",
+    });
+  }
+  try {
+    const result = await AdminService.deleteFromDB(id);
+    res.status(200).json({
+      status: 200,
+      message: "Admin deleted Successfully By ID!",
+      data: result,
+    });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: err.name || "Failed to fetch Admins By ID",
+        error: err.message,
+      });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Failed to fetch Admins By ID",
+      error: err,
+    });
+  }
+};
+
+const softDeleteFromDB = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(StatusCodes.BAD_REQUEST).json({
+      success: false,
+      message: "ID parameter is required",
+    });
+  }
+  try {
+    const result = await AdminService.softDeleteFromDB(id);
+    res.status(200).json({
+      status: 200,
+      message: "Admin deleted Successfully By ID!",
+      data: result,
+    });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: err.name || "Failed to fetch Admins By ID",
+        error: err.message,
+      });
+    }
+
+    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Failed to fetch Admins By ID",
+      error: err,
+    });
+  }
+};
+
 export const AdminController = {
   getAllFromDB,
   getByIdFromDB,
+  updateIntoDB,
+  deleteFromDB,
+  softDeleteFromDB,
 };
