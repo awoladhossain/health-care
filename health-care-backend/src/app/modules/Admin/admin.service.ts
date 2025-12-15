@@ -29,8 +29,9 @@ const getAllFromDB = async (params: any, options: any) => {
     });
   }
 
+  // Exclude deleted records
   addCondition.push({
-    isDeleted: true,
+    isDeleted: false,
   });
 
   const whereConditions: Prisma.AdminWhereInput = { AND: addCondition };
@@ -60,20 +61,25 @@ const getAllFromDB = async (params: any, options: any) => {
   };
 };
 
-const getByIdFromDB = async (id: string) => {
+const getByIdFromDB = async (id: string): Promise<Admin | null> => {
   console.log(id);
   const result = await prisma.admin.findUnique({
     where: {
       id,
+      isDeleted: false,
     },
   });
   return result;
 };
 
-const updateIntoDB = async (id: string, data: Partial<Admin>) => {
+const updateIntoDB = async (
+  id: string,
+  data: Partial<Admin>
+): Promise<Admin | null> => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
@@ -84,7 +90,7 @@ const updateIntoDB = async (id: string, data: Partial<Admin>) => {
   return result;
 };
 
-const deleteFromDB = async (id: string) => {
+const deleteFromDB = async (id: string): Promise<Admin | null> => {
   const result = await prisma.$transaction(async (transactionClient) => {
     const adminExists = await transactionClient.admin.findUnique({
       where: { id },
@@ -96,19 +102,19 @@ const deleteFromDB = async (id: string) => {
     const adminDeletedData = await transactionClient.admin.delete({
       where: { id },
     });
-    const userDeletedData = await transactionClient.user.delete({
+    await transactionClient.user.delete({
       where: { email: adminDeletedData.email },
     });
 
-    return userDeletedData;
+    return adminDeletedData;
   });
   return result;
 };
 
-const softDeleteFromDB = async (id: string) => {
+const softDeleteFromDB = async (id: string): Promise<Admin | null> => {
   const result = await prisma.$transaction(async (transactionClient) => {
     const adminExists = await transactionClient.admin.findUnique({
-      where: { id },
+      where: { id, isDeleted: false },
     });
     if (!adminExists) {
       throw new Error(`Admin with id ${id} not found`);
@@ -120,14 +126,14 @@ const softDeleteFromDB = async (id: string) => {
         isDeleted: true,
       },
     });
-    const userDeletedData = await transactionClient.user.update({
+    await transactionClient.user.update({
       where: { email: adminDeletedData.email },
       data: {
         status: UserStatus.DELETED,
       },
     });
 
-    return userDeletedData;
+    return adminDeletedData;
   });
   return result;
 };
