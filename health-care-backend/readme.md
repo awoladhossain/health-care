@@ -266,7 +266,7 @@ export const deleteUser = async (id: string) => {
 
 ## 📂 Step 10: Project Structure
 
-```
+```struct
 my-project/
 ├── prisma/
 │   ├── schema.prisma
@@ -474,7 +474,7 @@ NODE_ENV="development"
 
 **`.gitignore`:**
 
-```
+```bash
 node_modules/
 .env
 dist/
@@ -578,6 +578,6 @@ This guide is open source and available under the [MIT License](LICENSE).
 
 ---
 
-**Made with ❤️ for the Node.js & Prisma community**
+***Made with ❤️ for the Node.js & Prisma community***
 
 **Save this guide and follow it every time you set up Prisma in a new project!** 🚀
