@@ -424,8 +424,6 @@ async function main() {
       },
     },
   });
-
-  console.log('Created user:', user);
 }
 
 main()

@@ -1,4 +1,4 @@
-import jwt, { SignOptions } from "jsonwebtoken";
+import jwt, { JwtPayload, Secret, SignOptions } from "jsonwebtoken";
 
 interface IJwtPayload {
   email: string;
@@ -12,7 +12,7 @@ const generateToken = (
 ): string => {
   return jwt.sign(
     payload,
-    secretKey as jwt.Secret,
+    secretKey as Secret,
     {
       algorithm: "HS256",
       expiresIn,
@@ -20,4 +20,10 @@ const generateToken = (
   );
 };
 
-export default generateToken;
+const verifyToken = (token: string, secretKey: Secret) => {
+  return jwt.verify(token, secretKey) as JwtPayload;
+};
+export const jwtHelpers = {
+  generateToken,
+  verifyToken,
+};
