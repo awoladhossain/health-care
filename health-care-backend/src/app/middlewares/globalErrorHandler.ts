@@ -7,7 +7,7 @@ export const globalErrorHandler = (
   res: Response,
   next: NextFunction
 ) => {
-  console.error("Error caught by middleware:", err);
+
   if (err instanceof Error) {
     return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
