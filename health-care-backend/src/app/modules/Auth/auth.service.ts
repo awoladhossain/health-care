@@ -4,6 +4,7 @@ import { SignOptions } from "jsonwebtoken";
 import config from "../../../config";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import prisma from "../../../shared/prisma";
+import ApiError from "../../errors/ApiError";
 
 const loginUserService = async (payload: {
   email: string;
@@ -20,7 +21,7 @@ const loginUserService = async (payload: {
     userData.password
   );
   if (!isCorrectPassword) {
-    throw new Error("Password is incorrect");
+    throw new ApiError(401, "Password is incorrect");
   }
 
   const accessToken = jwtHelpers.generateToken(
@@ -54,7 +55,7 @@ const refreshTokenService = async (token: string) => {
       config.jwt.refresh_token_secret as string
     );
   } catch (error) {
-    throw new Error("Your are not authorized to access this route");
+    throw new ApiError(401, "Invalid refresh token");
   }
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
@@ -62,13 +63,14 @@ const refreshTokenService = async (token: string) => {
       status: UserStatus.ACTIVE,
     },
   });
+
   const accessToken = jwtHelpers.generateToken(
     {
       email: userData.email,
       role: userData.role,
     },
-    "nextLevelAccessSecretKey",
-    "15m"
+    config.jwt.jwt_secret as string,
+    config.jwt.jwt_expiresIn as SignOptions["expiresIn"]
   );
   return {
     accessToken,
@@ -76,7 +78,64 @@ const refreshTokenService = async (token: string) => {
   };
 };
 
+const changePasswordService = async (user: any, payload: any) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+  const isCorrectPassword: boolean = await bcrypt.compare(
+    payload.oldPassword,
+    userData.password
+  );
+  if (!isCorrectPassword) {
+    throw new ApiError(401, "Old password is incorrect");
+  }
+  const hashedPassword: string = await bcrypt.hash(payload.newPassword, 10);
+
+  await prisma.user.update({
+    where: {
+      email: userData.email,
+    },
+    data: {
+      password: hashedPassword,
+      needPasswordChange: false,
+    },
+  });
+  return {
+    message: "Password changed successfully",
+  };
+};
+
+const forgotPasswordService = async (payload: { email: string }) => {
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: payload.email,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  if (!userData) {
+    throw new ApiError(401, "User not found");
+  }
+  const resetPasswordToken = jwtHelpers.generateToken(
+    {
+      email: userData.email,
+      role: userData.role,
+    },
+    config.jwt.reset_password_token_secret as string,
+    config.jwt.reset_password_token_expiresIn as SignOptions["expiresIn"]
+  );
+  const resetPasswordLink =
+    config.reset_password_link +
+    `?userId=${userData.id}&token=${resetPasswordToken}`;
+  console.log(resetPasswordLink);
+};
+
 export const authServices = {
   loginUserService,
   refreshTokenService,
+  changePasswordService,
+  forgotPasswordService,
 };
