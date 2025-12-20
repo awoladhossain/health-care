@@ -144,15 +144,12 @@ const forgotPasswordService = async (payload: { email: string }) => {
        </p>
       </div>`
   );
-  console.log(resetPasswordLink);
 };
 
 const resetPasswordService = async (
   token: string,
   payload: { id: string; password: string }
 ) => {
-  console.log(token, payload);
-
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       id: payload.id,
