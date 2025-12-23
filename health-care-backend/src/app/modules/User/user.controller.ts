@@ -1,33 +1,19 @@
 // * all req,res will work here
-
-import { Request, Response } from "express";
+import { RequestHandler } from "express";
 import { StatusCodes } from "http-status-codes";
+import { sendResponse } from "../../../helpers/sendResponseHelper";
+import catchAsync from "../../../shared/catchAsync";
 import { userService } from "./user.service";
 
-const createAdmin = async (req: Request, res: Response) => {
-  try {
-    const result = await userService.createAdmin(req.body);
-    res.status(StatusCodes.OK).json({
-      status: StatusCodes.OK,
-      message: "Admin Created Successfully!",
-      data: result,
-    });
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: err.name || "Failed to create Admin",
-        error: err.message,
-      });
-    }
-
-    return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: "Failed to create Admin",
-      error: err,
-    });
-  }
-};
+const createAdmin: RequestHandler = catchAsync(async (req, res) => {
+  const result = await userService.createAdmin(req);
+  sendResponse(res, {
+    statusCode: StatusCodes.OK,
+    success: true,
+    message: "Admin created Successfully!",
+    data: result,
+  });
+});
 
 export const userController = {
   createAdmin,

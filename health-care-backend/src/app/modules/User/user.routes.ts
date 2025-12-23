@@ -1,25 +1,19 @@
 import { UserRole } from "@prisma/client";
-import express from "express";
-import multer from "multer";
+import express, { NextFunction, Request, Response } from "express";
+import { fileUploader } from "../../../helpers/fileUploader";
 import auth from "../../middlewares/auth";
 import { userController } from "./user.controller";
+import { userValidation } from "./user.validation";
 const router = express.Router();
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "/uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
-const upload = multer({ storage: storage });
 
 router.post(
   "/",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
-  upload.single("file"),
-  userController.createAdmin
+  fileUploader.upload.single("file"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = userValidation.createAdmin.parse(JSON.parse(req.body.data));
+    return userController.createAdmin(req, res, next);
+  }
 );
 
 export const userRoutes = router;
