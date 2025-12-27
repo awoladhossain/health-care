@@ -6,14 +6,6 @@ console.log("Loading .env from:", envPath);
 dotenv.config({
   path: envPath,
 });
-
-// Debug: Check if variables are loaded
-console.log("Environment variables loaded:", {
-  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? "✓" : "✗",
-  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ? "✓" : "✗",
-  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ? "✓" : "✗",
-});
-
 export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
