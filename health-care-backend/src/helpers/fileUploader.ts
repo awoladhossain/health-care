@@ -5,6 +5,11 @@ import path from "path";
 import { ICloudinaryResponse, IFile } from "../app/interfaces/file";
 import config from "../config";
 
+// Validate configuration before using
+if (!config.cloudinary.cloud_name || !config.cloudinary.api_key || !config.cloudinary.api_secret) {
+  throw new Error("Cloudinary configuration is missing. Please check your environment variables.");
+}
+ 
 cloudinary.config({
   cloud_name: config.cloudinary.cloud_name!,
   api_key: config.cloudinary.api_key!,

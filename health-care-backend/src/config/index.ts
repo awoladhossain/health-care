@@ -1,7 +1,17 @@
 import dotenv from "dotenv";
 import path from "path";
+const envPath = path.join(process.cwd(), ".env");
+console.log("Loading .env from:", envPath);
+
 dotenv.config({
-  path: path.join(process.cwd(), ".env"),
+  path: envPath,
+});
+
+// Debug: Check if variables are loaded
+console.log("Environment variables loaded:", {
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME ? "✓" : "✗",
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY ? "✓" : "✗",
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET ? "✓" : "✗",
 });
 
 export default {
