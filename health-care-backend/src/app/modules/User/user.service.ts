@@ -1,9 +1,12 @@
-import { Doctor, Patient, UserRole } from "@prisma/client";
+import { Doctor, Patient, Prisma, UserRole } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request } from "express";
 import { fileUploader } from "../../../helpers/fileUploader";
+import calculatePagination from "../../../helpers/paginationHelper";
 import prisma from "../../../shared/prisma";
 import { IFile } from "../../interfaces/file";
+import { IPaginationOptions } from "../../interfaces/pagination";
+import { userSearchAbleFields } from "./user.constant";
 
 const createAdmin = async (req: any) => {
   const file: IFile = req.file;
@@ -93,8 +96,63 @@ const createPatient = async (req: Request): Promise<Patient> => {
   return result;
 };
 
+const getAllFromDB = async (params: any, options: IPaginationOptions) => {
+  const { searchTerm, ...rest } = params;
+
+  const { limit, page, skip } = calculatePagination(options);
+  const addCondition: Prisma.UserWhereInput[] = [];
+
+  if (params.searchTerm) {
+    addCondition.push({
+      OR: userSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+  if (Object.keys(rest).length > 0) {
+    addCondition.push({
+      AND: Object.keys(rest).map((key) => ({
+        [key]: {
+          equals: (rest as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.UserWhereInput =
+    addCondition.length > 0 ? { AND: addCondition } : {};
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 export const userService = {
   createAdmin,
   createDoctor,
   createPatient,
+  getAllFromDB,
 };

@@ -4,6 +4,8 @@ import { StatusCodes } from "http-status-codes";
 import { sendResponse } from "../../../helpers/sendResponseHelper";
 import catchAsync from "../../../shared/catchAsync";
 import { userService } from "./user.service";
+import pick from "../../../shared/pick";
+import { userFilterAbleFileds } from "./user.constant";
 
 const createAdmin: RequestHandler = catchAsync(async (req, res) => {
   const result = await userService.createAdmin(req);
@@ -35,8 +37,23 @@ const createPatient: RequestHandler = catchAsync(async (req, res) => {
   });
 });
 
+const getAllFromDB:RequestHandler = catchAsync(async(req,res)=>{
+    const safeQuery = pick(req.query, userFilterAbleFileds);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+
+    const result = await userService.getAllFromDB(safeQuery, options);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "User Data Fetched Successfully!",
+      meta: result.meta,
+      data: result.data,
+    });
+})
+
 export const userController = {
   createAdmin,
   createDoctor,
   createPatient,
+  getAllFromDB,
 };

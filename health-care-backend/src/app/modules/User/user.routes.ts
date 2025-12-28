@@ -6,6 +6,8 @@ import { userController } from "./user.controller";
 import { userValidation } from "./user.validation";
 const router = express.Router();
 
+router.get("/", userController.getAllFromDB);
+
 router.post(
   "/create-admin",
   auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
