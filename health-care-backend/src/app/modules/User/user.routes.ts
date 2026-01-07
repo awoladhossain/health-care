@@ -2,6 +2,7 @@ import { UserRole } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { fileUploader } from "../../../helpers/fileUploader";
 import auth from "../../middlewares/auth";
+import validateRequest from "../../middlewares/validateRequest";
 import { userController } from "./user.controller";
 import { userValidation } from "./user.validation";
 const router = express.Router();
@@ -32,7 +33,6 @@ router.post(
   }
 );
 
-
 router.post(
   "/create-patient",
   fileUploader.upload.single("file"),
@@ -42,6 +42,11 @@ router.post(
   }
 );
 
-router.patch("/:id/status", userController.changeProfileStatus);
+router.patch(
+  "/:id/status",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validateRequest(userValidation.updateStatus),
+  userController.changeProfileStatus
+);
 
 export const userRoutes = router;
