@@ -136,6 +136,18 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
         : {
             createdAt: "desc",
           },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      status: true,
+      needPasswordChange: true,
+      createdAt: true,
+      updatedAt: true,
+      // admin: true,
+      // patient: true,
+      // doctor: true,
+    },
   });
   const total = await prisma.user.count({
     where: whereConditions,
@@ -150,9 +162,14 @@ const getAllFromDB = async (params: any, options: IPaginationOptions) => {
   };
 };
 
+const changeProfileStatus = async (id: string, data: { status: UserRole }) => {
+  console.log(id, data);
+};
+
 export const userService = {
   createAdmin,
   createDoctor,
   createPatient,
   getAllFromDB,
+  changeProfileStatus,
 };

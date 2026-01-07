@@ -6,7 +6,11 @@ import { userController } from "./user.controller";
 import { userValidation } from "./user.validation";
 const router = express.Router();
 
-router.get("/", userController.getAllFromDB);
+router.get(
+  "/",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  userController.getAllFromDB
+);
 
 router.post(
   "/create-admin",
@@ -28,6 +32,7 @@ router.post(
   }
 );
 
+
 router.post(
   "/create-patient",
   fileUploader.upload.single("file"),
@@ -36,5 +41,7 @@ router.post(
     return userController.createPatient(req, res, next);
   }
 );
+
+router.patch("/:id/status", userController.changeProfileStatus);
 
 export const userRoutes = router;
