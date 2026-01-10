@@ -1,9 +1,10 @@
 // * all req,res will work here
-import { RequestHandler } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { sendResponse } from "../../../helpers/sendResponseHelper";
 import catchAsync from "../../../shared/catchAsync";
 import pick from "../../../shared/pick";
+import { IAuthUser } from "../../interfaces/common";
 import { userFilterAbleFileds } from "./user.constant";
 import { userService } from "./user.service";
 
@@ -62,10 +63,40 @@ const changeProfileStatus = catchAsync(async (req, res) => {
   });
 });
 
+const getMyProfile = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    // Implementation for getting the profile of the logged-in user
+    const user = req.user;
+    const result = await userService.getMyProfile(user as IAuthUser);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Profile Fetched Successfully!",
+      data: result,
+    });
+  }
+);
+
+const updateMyProfile = catchAsync(
+  async (req: Request & { user?: IAuthUser }, res: Response) => {
+    // Implementation for updating the profile of the logged-in user
+    const user = req.user;
+    const result = await userService.updateMyProfile(user as IAuthUser, req);
+    sendResponse(res, {
+      statusCode: StatusCodes.OK,
+      success: true,
+      message: "Profile Updated Successfully!",
+      data: result,
+    });
+  }
+);
+
 export const userController = {
   createAdmin,
   createDoctor,
   createPatient,
   getAllFromDB,
   changeProfileStatus,
+  getMyProfile,
+  updateMyProfile,
 };
