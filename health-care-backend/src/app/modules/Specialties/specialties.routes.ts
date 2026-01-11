@@ -1,8 +1,12 @@
+import { UserRole } from "@prisma/client";
 import express, { NextFunction, Request, Response } from "express";
 import { fileUploader } from "../../../helpers/fileUploader";
+import auth from "../../middlewares/auth";
 import { SpecialtiesController } from "./specialties.controller";
 import { specialtiesValidation } from "./specialties.validation";
 const router = express.Router();
+
+router.get("/", SpecialtiesController.getAllFromDB);
 
 router.post(
   "/",
@@ -11,6 +15,12 @@ router.post(
     req.body = specialtiesValidation.create.parse(JSON.parse(req.body.data));
     return SpecialtiesController.insertIntoDB(req, res, next);
   }
+);
+
+router.delete(
+  "/:id",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  SpecialtiesController.deleteFromDB
 );
 
 export const specialtiesRoutes = router;
