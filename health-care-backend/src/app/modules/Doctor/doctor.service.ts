@@ -25,14 +25,14 @@ const getAllFromDB = async (
     });
   }
 
-  if (specialties && specialties.length > 0) {
-    // Corrected specialties condition
+  // ✅ Fixed specialties filter
+  if (specialties) {
     andConditions.push({
       doctorSpecialties: {
         some: {
           specialty: {
             title: {
-              contains: specialties,
+              contains: specialties, // ✅ Works for single string
               mode: "insensitive",
             },
           },
@@ -87,6 +87,7 @@ const getAllFromDB = async (
     data: result,
   };
 };
+
 const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
   const result = await prisma.doctor.findUnique({
     where: {
@@ -122,30 +123,28 @@ const updateIntoDB = async (id: string, payload: IDoctorUpdate) => {
     });
 
     if (specialties && specialties.length > 0) {
-      // delete specialties
       const deleteSpecialtiesIds = specialties.filter(
         (specialty) => specialty.isDeleted
       );
-      //console.log(deleteSpecialtiesIds)
+
       for (const specialty of deleteSpecialtiesIds) {
         await transactionClient.doctorSpecialties.deleteMany({
           where: {
             doctorId: doctorInfo.id,
-            specialtyId: specialty.specialtiesId,
+            specialtyId: specialty.specialtyId,
           },
         });
       }
 
-      // create specialties
       const createSpecialtiesIds = specialties.filter(
         (specialty) => !specialty.isDeleted
       );
-      console.log(createSpecialtiesIds);
+
       for (const specialty of createSpecialtiesIds) {
         await transactionClient.doctorSpecialties.create({
           data: {
             doctorId: doctorInfo.id,
-            specialtyId: specialty.specialtiesId,
+            specialtyId: specialty.specialtyId,
           },
         });
       }
@@ -167,8 +166,16 @@ const updateIntoDB = async (id: string, payload: IDoctorUpdate) => {
   return result;
 };
 
+// ✅ Fixed: Added cascade delete
 const deleteFromDB = async (id: string): Promise<Doctor> => {
   return await prisma.$transaction(async (transactionClient) => {
+    // Delete related doctorSpecialties first
+    await transactionClient.doctorSpecialties.deleteMany({
+      where: {
+        doctorId: id,
+      },
+    });
+
     const deleteDoctor = await transactionClient.doctor.delete({
       where: {
         id,

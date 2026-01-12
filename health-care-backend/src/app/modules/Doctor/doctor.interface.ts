@@ -14,7 +14,7 @@ export type IDoctorUpdate = {
   registrationNumber: string;
   experience: number;
   gender: "MALE" | "FEMALE";
-  apointmentFee: number;
+  appointmentFee: number;  // ✅ Fixed typo
   qualification: string;
   currentWorkingPlace: string;
   designation: string;
@@ -22,6 +22,6 @@ export type IDoctorUpdate = {
 };
 
 export type ISpecialties = {
-  specialtiesId: string;
-  isDeleted?: null;
+  specialtyId: string;      // ✅ Matches Prisma schema
+  isDeleted?: boolean | null;  // ✅ Better type definition
 };

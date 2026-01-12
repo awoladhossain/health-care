@@ -8,10 +8,10 @@ const create = z.object({
   registrationNumber: z.string().min(3),
   experience: z.number(),
   gender: z.string(),
-  apointmentFee: z.number(),
+  appointmentFee: z.number(), // ✅ Fixed spelling
   qualification: z.string(),
   designation: z.string(),
-  currentworkingplace: z.string(),
+  currentWorkingPlace: z.string(), // ✅ Fixed casing
 });
 
 const update = z.object({
@@ -22,9 +22,9 @@ const update = z.object({
     registrationNumber: z.string().optional(),
     experience: z.number().optional(),
     gender: z.string().optional(),
-    apointmentFee: z.number().optional(),
+    appointmentFee: z.number().optional(), // ✅ Fixed spelling
     qualification: z.string().optional(),
-    currentworkingplace: z.string().optional(),
+    currentWorkingPlace: z.string().optional(), // ✅ Fixed casing
     designation: z.string().optional(),
   }),
 });
