@@ -37,6 +37,7 @@ const moduleRoutes = [
     path: "/schedule",
     route: ScheduleRoutes,
   },
+  
 ];
 moduleRoutes.forEach((route) => router.use(route.path, route.route));
 export default router;
