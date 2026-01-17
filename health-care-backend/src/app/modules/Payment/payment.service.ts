@@ -1,6 +1,12 @@
 import axios from "axios";
 import config from "../../../config";
+import prisma from "../../../shared/prisma";
 const initPayment = async (appointmentId: string) => {
+  const paymentData = await prisma.payment.findFirst({
+    where: {
+      appointmentId,
+    },
+  });
   const data = {
     store_id: config.ssl.storeId,
     store_passwd: config.ssl.storePasswd,
